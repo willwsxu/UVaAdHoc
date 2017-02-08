@@ -6,6 +6,8 @@
 package uvaadhoc;
 
 import static java.lang.System.out;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -42,37 +44,65 @@ public class NQueen {
         }
         return true;
     }
-    static void permute(int []v, int n, int i) // 1 to n 
+    static boolean validateQueens(int[] v, int filledRows, int candidateCol)
+    {
+        for (int i=0; i<filledRows; i++) {
+            if (v[i]==candidateCol)
+                return false;  // column is already picked
+            int hdist = filledRows-i;
+            int vdist = v[i]-candidateCol;
+            if (hdist==vdist || hdist == -vdist)
+                return false;
+        }
+        return true;
+    }
+    static void print(int []v)
+    {/*
+        for (int k:v)
+            out.print(k+" ");
+        out.println();
+        */
+    }
+    static int loops=0;
+    static void permute(int []v, int n, int i) // i to n 
     {
         if (i==n) {
-            if ( validateQueens(v)) {
-                for (int k:v)
-                    out.print(k+" ");
-                out.println();
-            }
+            if ( validateQueens(v)) 
+                print(v);
         }
         else 
             for (int j=i; j<n; j++) {
+                loops++;
                 swap(v, i, j);
                 permute(v, n, i+1);
                 swap(v, i, j);
             }
     }
-    void fullSearch(int firstPos)
+    static int loops2=0;
+    static void enhancedPermute(int []v, int n, int i)
     {
-        Arrays.fill(board, 0);
-        board[0] = firstPos;
-        List<Integer> columnsOpen = new LinkedList<>();
-        Collections.fill(columnsOpen, 0);
-        for (int i=1; i<board.length; i++) { // try to find position for next row
-            for (int j=0; j<i; j++) { // 
-                
+        if (i==n)
+            print(v);
+        else {
+            for (int c=0; c<n; c++) {
+                loops2++;
+                if (validateQueens(v, i, c)) {
+                    v[i]=c;
+                    enhancedPermute(v, n, i+1);
+                }
             }
         }
     }
     
     public static void main(String[] args)
     {
+        Instant start = Instant.now();
         permute(new int[]{1,2,3,4,5,6,7,8}, 8, 0);
+        Instant end = Instant.now();
+        out.println("permute takes "+ChronoUnit.MICROS.between(start, end)+" loops "+loops);    //3-4 msec
+        start = Instant.now();
+        enhancedPermute(new int[]{1,2,3,4,5,6,7,8}, 8, 0);
+        end = Instant.now();
+        out.println("enhancedPermute takes "+ChronoUnit.MICROS.between(start, end)+" loops "+loops2);  //1 msec
     }
 }
