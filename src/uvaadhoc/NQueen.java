@@ -66,13 +66,13 @@ public class NQueen {
     static int loops=0;
     static void permute(int []v, int n, int i) // i to n 
     {
+        loops++;
         if (i==n) {
             if ( validateQueens(v)) 
                 print(v);
         }
         else 
             for (int j=i; j<n; j++) {
-                loops++;
                 swap(v, i, j);
                 permute(v, n, i+1);
                 swap(v, i, j);
@@ -81,11 +81,12 @@ public class NQueen {
     static int loops2=0;
     static void enhancedPermute(int []v, int n, int i)
     {
-        if (i==n)
+        loops2++;
+        if (i==n) {
             print(v);
+        }
         else {
             for (int c=0; c<n; c++) {
-                loops2++;
                 if (validateQueens(v, i, c)) {
                     v[i]=c;
                     enhancedPermute(v, n, i+1);
@@ -97,12 +98,14 @@ public class NQueen {
     public static void main(String[] args)
     {
         Instant start = Instant.now();
-        permute(new int[]{1,2,3,4,5,6,7,8}, 8, 0);
+        permute(new int[]{1,2,3,4,5,6,7,8,9,10,11,12}, 8, 0);
         Instant end = Instant.now();
-        out.println("permute takes "+ChronoUnit.MICROS.between(start, end)+" loops "+loops);    //3-4 msec
+        //3-4 msec when n is 8, 9 sec when n is 12
+        out.println("permute takes "+ChronoUnit.MICROS.between(start, end)+" loops "+loops);
         start = Instant.now();
-        enhancedPermute(new int[]{1,2,3,4,5,6,7,8}, 8, 0);
+        enhancedPermute(new int[]{1,2,3,4,5,6,7,8,9,10,11,12}, 12, 0);
         end = Instant.now();
-        out.println("enhancedPermute takes "+ChronoUnit.MICROS.between(start, end)+" loops "+loops2);  //1 msec
+        //1 msec when n is 8, 116 msec when n is 12
+        out.println("enhancedPermute takes "+ChronoUnit.MICROS.between(start, end)+" loops "+loops2);
     }
 }
