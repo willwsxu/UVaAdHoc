@@ -44,18 +44,6 @@ public class NQueen {
         }
         return true;
     }
-    static boolean validateQueens(int[] v, int filledRows, int candidateCol)
-    {
-        for (int i=0; i<filledRows; i++) {
-            if (v[i]==candidateCol)
-                return false;  // column is already picked
-            int hdist = filledRows-i;
-            int vdist = v[i]-candidateCol;
-            if (hdist==vdist || hdist == -vdist)
-                return false;
-        }
-        return true;
-    }
     static void print(int []v)
     {/*
         for (int k:v)
@@ -77,6 +65,25 @@ public class NQueen {
                 permute(v, n, i+1);
                 swap(v, i, j);
             }
+    }
+}
+class NQueen2 extends NQueen
+{
+    public NQueen2(int n)
+    {
+        super(n);
+    }
+    static boolean validateQueens(int[] v, int filledRows, int candidateCol)
+    {
+        for (int i=0; i<filledRows; i++) {
+            if (v[i]==candidateCol)
+                return false;  // column is already picked
+            int hdist = filledRows-i;
+            int vdist = v[i]-candidateCol;
+            if (hdist==vdist || hdist == -vdist)
+                return false;
+        }
+        return true;
     }
     static int loops2=0;
     static void enhancedPermute(int []v, int n, int i)
