@@ -20,7 +20,7 @@ import java.util.stream.Stream;
  */
 public class NQueen {
     
-    int []board;
+    int []board;  // rows, store values of column
     int n;
     NQueen(int n)
     {
@@ -38,8 +38,8 @@ public class NQueen {
     {
         for (int i=0; i<v.length-1; i++) {
             for (int j=i+1; j<v.length; j++) {
-                int hdist = j-i;
-                int vdist = v[i]-v[j];
+                int vdist = j-i;
+                int hdist = v[i]-v[j];
                 if (hdist==vdist || hdist == -vdist)
                     return false;
             }
@@ -81,6 +81,7 @@ public class NQueen {
         out.println("permute takes "+ChronoUnit.MICROS.between(start, end)+"nsec, loops "+loops+" answers "+soln);
     }
 }
+
 class NQueen2 extends NQueen
 {
     public NQueen2(int n)
@@ -116,6 +117,52 @@ class NQueen2 extends NQueen
             }
         }
     }
+}
+    
+/**
+ *  Use diagonal property that r+c is same for squares on backward diagonal
+ *  r-c is same for squares on forward diagonal, add n-1 to make it positive
+**/
+class NQueen3 extends NQueen
+{
+    boolean colFilled[]; 
+    boolean fd[]; //foward diagnoal, r-c is same
+    boolean bd[]; // backward diagonal, r+c same
+    public NQueen3(int n1)
+    {
+        super(n1);
+        colFilled = new boolean[n];
+        fd = new boolean[2*n-1];
+        bd = new boolean[2*n-1];
+    }
+
+    void permute(int i)
+    {
+        loops++;
+        if (i==n) {
+            print(board);
+            soln++;
+        }
+        else {
+            for (int c=0; c<n; c++) {
+                if (colFilled[c])
+                    continue;
+                if (bd[c+i])
+                    continue;
+                if (fd[n-1+c-i])
+                    continue;
+                bd[c+i] = true;
+                fd[n-1+c-i] = true;
+                colFilled[c] = true;
+                board[i]=c;
+                permute(i+1);
+                bd[c+i] = false;  // restore
+                fd[n-1+c-i] = false;
+                colFilled[c] = false;
+            }
+        }
+    }
+   
     
     public static void main(String[] args)
     {
@@ -124,5 +171,8 @@ class NQueen2 extends NQueen
         
         new NQueen2(12).solve();
         //1 msec when n is 8, 116 msec when n is 12, 3.9 sec when n is 14
+        
+        new NQueen3(14).solve();
+        //0 msec when n is 8, 70 msec when n is 12, 2.4 sec when n is 14
     }
 }
