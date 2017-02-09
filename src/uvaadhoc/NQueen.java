@@ -99,36 +99,30 @@ class NQueen2 extends NQueen
         }
         return true;
     }
-    void enhancedPermute(int []v, int n, int i)
+    // enhanced backtracking
+    void permute(int i)
     {
         loops++;
         if (i==n) {
-            print(v);
+            print(board);
             soln++;
         }
         else {
             for (int c=0; c<n; c++) {
-                if (validateQueens(v, i, c)) {
-                    v[i]=c;
-                    enhancedPermute(v, n, i+1);
+                if (validateQueens(board, i, c)) {
+                    board[i]=c;
+                    permute(i+1);
                 }
             }
         }
     }
     
-    void solve()
-    {
-        Instant start = Instant.now();
-        enhancedPermute(board, n, 0);
-        Instant end = Instant.now();
-        out.println("permute takes "+ChronoUnit.MICROS.between(start, end)+"nsec, loops "+loops+" answers "+soln);
-    }
     public static void main(String[] args)
     {
         new NQueen(8).solve();
         //3-4 msec when n is 8, 9 sec when n is 12
         
-        new NQueen2(14).solve();
+        new NQueen2(12).solve();
         //1 msec when n is 8, 116 msec when n is 12, 3.9 sec when n is 14
     }
 }
