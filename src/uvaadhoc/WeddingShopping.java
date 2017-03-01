@@ -14,13 +14,34 @@ import java.util.Scanner;
  * @author WXU
  */
 // Dynamic programming
-class WeddingShoppingTopDown {
+class WeddingShopping {
     int M;  // money available, 1<= M <= 200
     int C;  // garments to buy, 1 <= C <= 20
     int [][] price= new int[25][25];//price per garment per model, 1<=model<=20
     
     final int MAX_M = 210;
     final int MAX_G = 25;
+    
+    static Scanner scan = new Scanner(System.in);    
+    static void autotest()
+    {
+        int TC = scan.nextInt();
+        for (int i=0; i<TC; i++) {
+            int M = scan.nextInt();
+            int C = scan.nextInt();
+            new WeddingShoppingTopDown(M, C);
+        }        
+    }
+    
+    public static void main(String[] args)
+    {
+        autotest();
+    }
+}
+
+
+class WeddingShoppingTopDown extends WeddingShopping
+{
     int[][] memo = new int[MAX_M][MAX_G];
     
     {
@@ -43,7 +64,6 @@ class WeddingShoppingTopDown {
         return memo[money][g]=ans;
     }
     
-    static Scanner scan = new Scanner(System.in);
     public WeddingShoppingTopDown(int M, int C)
     {
         this.M = M;
@@ -58,20 +78,5 @@ class WeddingShoppingTopDown {
             out.println("no solution");
         else
             out.println(maxUsed);
-    }
-    
-    static void autotest()
-    {
-        int TC = scan.nextInt();
-        for (int i=0; i<TC; i++) {
-            int M = scan.nextInt();
-            int C = scan.nextInt();
-            new WeddingShoppingTopDown(M, C);
-        }        
-    }
-    
-    public static void main(String[] args)
-    {
-        autotest();
     }
 }
