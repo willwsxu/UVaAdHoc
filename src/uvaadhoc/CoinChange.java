@@ -18,10 +18,10 @@ import java.util.TreeSet;
 public class CoinChange {
     int []coinType;
     int coinCount=Integer.MAX_VALUE;
-    int ways=0;
+    long ways=0;
     Set<Integer> answer = new TreeSet<>();
     
-    // cfind the total number of different ways of making changes
+    // find the total number of different ways of making changes
     void change(int remain, int count)
     {
         if (remain==0) {
@@ -39,7 +39,7 @@ public class CoinChange {
     
     // change to get minimal coins
     // too slow for 100cents coins
-    int change2(int remain)
+    int changeMin(int remain)
     {
         if (remain==0) {
             return 0;
@@ -48,28 +48,52 @@ public class CoinChange {
             return Integer.MAX_VALUE;
         int result=Integer.MAX_VALUE;
         for (int i=0; i<coinType.length; i++) {
-            int res = change2(remain-coinType[i]);
+            int res = changeMin(remain-coinType[i]);
             if ( res < result)
                 result = res;
         }
         return 1+result;
     }
     
+    // ways of making changes
+    // implementation without recursion, Dynamic programming
+    long changeWaysNoRecur(int cents, int[]coinType)
+    {
+        long D[] = new long[cents+1];
+        D[0]=D[1]=1;
+        for (int i=2; i<=cents; i++) {
+            D[i]=0;
+            for (int j=0; j<coinType.length; j++) {
+                if (i>=coinType[j])
+                    D[i] += D[i-coinType[j]];
+            }
+            //out.println("cents "+i+" ways "+D[i]);
+        }
+        return D[cents];
+    }
+    
     public int coins(int cents, int[]coinType)
     {
         this.coinType = coinType;
         //Arrays.sort(coinType); // should reverse sort
-        Instant start = Instant.now();
         //change(cents, 0);
-        coinCount = change2(cents);
-        Instant end = Instant.now();
-        out.println("takes "+ChronoUnit.MICROS.between(start, end)+" min coins "+coinCount+" ways "+ways+answer);
+        //out.println("change "+ways+" min count "+coinCount+answer);
+        
+        //coinCount = changeMin(cents);
+        //out.println("changeMin "+coinCount);
+        
+        ways = changeWaysNoRecur(cents, coinType);
+        out.println("changeWaysNoRecur "+ways);
         return 0;
     }
     
     public static void main(String[] args)
     {
-        new CoinChange().coins(27, new int[]{50, 25, 10, 5,1});
+        Instant start = Instant.now();
+        // overflows from cents=146
+        new CoinChange().coins(145, new int[]{50, 25, 10, 5,1});
+        Instant end = Instant.now();
+        out.println("change takes "+ChronoUnit.MICROS.between(start, end));
     }
 }
 
