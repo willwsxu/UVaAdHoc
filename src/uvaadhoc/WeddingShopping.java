@@ -24,18 +24,19 @@ Sample Output
 19
 no solution
 */
+/*
+1 100 4  3 8 45 4 2 5 10 4 1 3 3 7 4 50 14 43 8  -> 45+5+7+43=100
+1 100 4  3 8 45 4 2 6 10 4 1 3 3 7 4 50 14 43 8  -> 45+10+1+43=99
+1 100 4  3 8 45 4 2 6 10 4 4 3 3 7 4 50 14 43 8  -> 45+6+4+43=98
+*/
 package uvaadhoc;
 
 import static java.lang.Integer.max;
 import static java.lang.System.out;
 import java.util.Scanner;
 
-/**
- *
- * @author WXU
- */
 // Dynamic programming
-class WeddingShopping {
+abstract class WeddingShopping {
     int M;  // money available, 1<= M <= 200
     int C;  // garments to buy, 1 <= C <= 20
     int [][] price= new int[25][25];//price per garment per model, 1<=model<=20
@@ -43,7 +44,7 @@ class WeddingShopping {
     final int MAX_M = 210;
     final int MAX_G = 25;
     
-    WeddingShopping(int M, int C)
+    void init(int M, int C)
     {
         this.M = M;
         this.C = C;
@@ -53,20 +54,16 @@ class WeddingShopping {
                 price[i][j] = scan.nextInt();
         }
     }
+    abstract void run(int M, int C);
     static Scanner scan = new Scanner(System.in);    
-    static void autotest()
+    static void autotest(WeddingShopping shop)
     {
         int TC = scan.nextInt();
         for (int i=0; i<TC; i++) {
             int M = scan.nextInt();
             int C = scan.nextInt();
-            new WeddingShoppingTopDown(M, C);
+            shop.run(M, C);
         }        
-    }
-    
-    public static void main(String[] args)
-    {
-        autotest();
     }
 }
 
@@ -74,12 +71,7 @@ class WeddingShopping {
 class WeddingShoppingTopDown extends WeddingShopping
 {
     int[][] memo = new int[MAX_M][MAX_G];
-    
-    {
-        for (int i=0; i<MAX_M; i++)
-            for (int j=0; j<MAX_G; j++)
-                memo[i][j]=-1;
-    }
+
     // money available to shop for garment g
     int shop(int money, int g)
     {
@@ -95,14 +87,23 @@ class WeddingShoppingTopDown extends WeddingShopping
         return memo[money][g]=ans;
     }
     
-    public WeddingShoppingTopDown(int M, int C)
+    @Override
+    void run(int M, int C)
     {
-        super(M, C);
+        init(M, C);
+        for (int i=0; i<MAX_M; i++)
+            for (int j=0; j<MAX_G; j++)
+                memo[i][j]=-1;
         int maxUsed = shop(M, 0);
         if (maxUsed<0)
             out.println("no solution");
         else
             out.println(maxUsed);
+    }
+    
+    public static void main(String[] args)
+    {
+        autotest(new WeddingShoppingTopDown());
     }
 }
 
@@ -111,11 +112,6 @@ class WeddingShoppingBottomUp extends WeddingShopping
     // each show moeny left after buy any of the model of garment
     boolean[][] table = new boolean[MAX_G][MAX_M];
     
-    {
-        for (int i=0; i<MAX_G; i++)
-            for (int j=0; j<MAX_M; j++)
-                table[i][j]=false;
-    }
     void shop()
     {
         for (int i=1; i<=price[0][0]; i++) // fill first row table with garment 1
@@ -143,10 +139,14 @@ class WeddingShoppingBottomUp extends WeddingShopping
         out.println("no solution");
         return;
     }
-    
-    public WeddingShoppingBottomUp(int M, int C)
+        
+    @Override
+    void run(int M, int C)
     {
-        super(M, C);
+        init(M, C);
+        for (int i=0; i<MAX_G; i++)
+            for (int j=0; j<MAX_M; j++)
+                table[i][j]=false;
         shop();
     }
 }
