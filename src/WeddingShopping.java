@@ -1,9 +1,10 @@
+
 import static java.lang.Integer.max;
 import static java.lang.System.out;
 import java.util.Scanner;
 
 // Dynamic programming
-class WeddingShoppingTD {
+abstract class WeddingShopping {
     int M;  // money available, 1<= M <= 200
     int C;  // garments to buy, 1 <= C <= 20
     int [][] price= new int[25][25];//price per garment per model, 1<=model<=20
@@ -21,8 +22,9 @@ class WeddingShoppingTD {
                 price[i][j] = scan.nextInt();
         }
     }
+    abstract void run(int M, int C);
     static Scanner scan = new Scanner(System.in);    
-    static void autotest(WeddingShoppingTD shop)
+    static void autotest(WeddingShopping shop)
     {
         int TC = scan.nextInt();
         for (int i=0; i<TC; i++) {
@@ -31,7 +33,11 @@ class WeddingShoppingTD {
             shop.run(M, C);
         }        
     }
-    
+}
+
+
+class WeddingShoppingTopDown extends WeddingShopping
+{
     int[][] memo = new int[MAX_M][MAX_G];
 
     // money available to shop for garment g
@@ -49,6 +55,7 @@ class WeddingShoppingTD {
         return memo[money][g]=ans;
     }
     
+    @Override
     void run(int M, int C)
     {
         init(M, C);
@@ -61,10 +68,58 @@ class WeddingShoppingTD {
         else
             out.println(maxUsed);
     }
-    
     public static void main(String[] args)
     {
-        autotest(new WeddingShoppingTD());
+        //scan = uvaadhoc.CodeChef.getFileScanner("weddingshopping.txt");
+        autotest(new WeddingShoppingTopDown());
     }
 }
 
+class WeddingShoppingBottomUp extends WeddingShopping
+{
+    // each show money left after buy any of the model of garment
+    boolean[][] table = new boolean[MAX_G][MAX_M];
+    
+    void shop()
+    {
+        for (int i=1; i<=price[0][0]; i++) // fill first row table with garment 1
+        {
+            if ( M-price[0][i]<0)
+                continue;
+            table[0][M-price[0][i]]=true;
+        }
+        for (int g=1; g<C; g++) {  // garment 1 to C
+            for (int m=0; m<M; m++) {
+                if (!table[g-1][m])  // no such money exist since previous buys
+                    continue;
+                for (int i=1; i<=price[g][0]; i++) {
+                    if (m-price[g][i]>=0) // money left to buy this model of garment
+                        table[g][m-price[g][i]]=true;
+                }
+            }            
+        }
+        for (int m=0; m<M; m++) {
+            if (table[C-1][m]) {
+                out.println(M-m);
+                return;
+            }
+        }
+        out.println("no solution");
+        return;
+    }
+        
+    @Override
+    void run(int M, int C)
+    {
+        init(M, C);
+        for (int i=0; i<MAX_G; i++)
+            for (int j=0; j<MAX_M; j++)
+                table[i][j]=false;
+        shop();
+    }
+    public static void xmain(String[] args)
+    {
+        //scan = uvaadhoc.CodeChef.getFileScanner("weddingshopping.txt");
+        autotest(new WeddingShoppingBottomUp());
+    }
+}
