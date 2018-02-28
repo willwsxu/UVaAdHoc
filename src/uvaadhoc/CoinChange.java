@@ -39,22 +39,34 @@ public class CoinChange {
     }
     
     // change to get minimal coins
-    // too slow for 100cents coins
-    int changeMin(int remain)
+    // too slow for 100cents coins, without using dynamic programming
+    int dpCount[];
+    private int changeMin(int remain)
     {
-        if (remain==0) {
-            return 0;
-        }
         if (remain <0)
             return Integer.MAX_VALUE;
+        if (dpCount[remain]>=0)   // dynamic programming
+            return dpCount[remain];
         int result=Integer.MAX_VALUE;
         for (int i=0; i<coinType.length; i++) {
             int res = changeMin(remain-coinType[i]);
             if ( res < result)
                 result = res;
         }
-        return 1+result;
+        dpCount[remain] = result==Integer.MAX_VALUE?Integer.MAX_VALUE:1+result;
+        return dpCount[remain];
     }
+    public int coinChangeRecur(int[] coins, int amount) // recursive
+    {
+        this.coinType = coins;
+        dpCount = new int[amount+1];
+        Arrays.fill(dpCount, -1);
+        dpCount[0]=0;
+        return changeMin(amount)==Integer.MAX_VALUE?-1:changeMin(amount);
+    }
+    
+    // given coins of different denominations and a total amount of money
+    // find fewest coins to make up that amount
     public int coinChange(int[] coins, int amount) {  // beat 95% leetcode
         int MAX_VAL=amount+1;
         int dp[]=new int[MAX_VAL]; // index on all money amount
@@ -112,10 +124,15 @@ public class CoinChange {
         Instant end = Instant.now();
         out.println("change takes "+ChronoUnit.MICROS.between(start, end));
         
-        
         System.out.println(new CoinChange().coinChange(new int[]{1,2,5}, 11)==3);
         System.out.println(new CoinChange().coinChange(new int[]{7,5}, 11)==-1);
         System.out.println(new CoinChange().coinChange(new int[]{1,7,5}, 4)==4);
+        System.out.println(new CoinChange().coinChange(new int[]{1,5, 10, 25}, 100)==4);
+        
+        System.out.println(new CoinChange().coinChangeRecur(new int[]{1,2,5}, 11)==3);
+        System.out.println(new CoinChange().coinChangeRecur(new int[]{7,5}, 11)==-1);
+        System.out.println(new CoinChange().coinChangeRecur(new int[]{1,7,5}, 4)==4);
+        System.out.println(new CoinChange().coinChangeRecur(new int[]{1,5, 10, 25}, 100)==4);
     }
 }
 
