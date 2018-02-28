@@ -55,22 +55,21 @@ public class CoinChange {
         }
         return 1+result;
     }
-    public int coinChange(int[] coins, int amount) {  // beat 55%leetcode
-        int dp[]=new int[amount+1]; // index on all money amount
+    public int coinChange(int[] coins, int amount) {  // beat 95% leetcode
+        int MAX_VAL=amount+1;
+        int dp[]=new int[MAX_VAL]; // index on all money amount
         dp[0]=0;
         for (int i=1; i<=amount; i++) {
-            int count=Integer.MAX_VALUE;
+            int count=MAX_VAL;
             for (int j=0; j<coins.length; j++) {
                 if (coins[j]>i)  // coin value too big
                     continue;
-                int rem=i-coins[j];
-                if (dp[rem]!=Integer.MAX_VALUE)
-                    count = Integer.min(count, 1+dp[rem]);
+                count = Integer.min(count, 1+dp[i-coins[j]]);
             }
             dp[i]=count;
         }
         //System.out.println(Arrays.toString(dp));
-        return dp[amount]!=Integer.MAX_VALUE?dp[amount]:-1;
+        return dp[amount]>amount?-1:dp[amount];
     }
     
     // ways of making changes
@@ -114,8 +113,9 @@ public class CoinChange {
         out.println("change takes "+ChronoUnit.MICROS.between(start, end));
         
         
-        System.out.println(new CoinChange().coinChange(new int[]{1,2,5}, 11));
-        System.out.println(new CoinChange().coinChange(new int[]{7,5}, 11));
+        System.out.println(new CoinChange().coinChange(new int[]{1,2,5}, 11)==3);
+        System.out.println(new CoinChange().coinChange(new int[]{7,5}, 11)==-1);
+        System.out.println(new CoinChange().coinChange(new int[]{1,7,5}, 4)==4);
     }
 }
 
