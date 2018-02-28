@@ -8,6 +8,7 @@ package uvaadhoc;
 import static java.lang.System.out;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.Arrays;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -54,6 +55,23 @@ public class CoinChange {
         }
         return 1+result;
     }
+    public int coinChange(int[] coins, int amount) {  // beat 55%leetcode
+        int dp[]=new int[amount+1]; // index on all money amount
+        dp[0]=0;
+        for (int i=1; i<=amount; i++) {
+            int count=Integer.MAX_VALUE;
+            for (int j=0; j<coins.length; j++) {
+                if (coins[j]>i)  // coin value too big
+                    continue;
+                int rem=i-coins[j];
+                if (dp[rem]!=Integer.MAX_VALUE)
+                    count = Integer.min(count, 1+dp[rem]);
+            }
+            dp[i]=count;
+        }
+        //System.out.println(Arrays.toString(dp));
+        return dp[amount]!=Integer.MAX_VALUE?dp[amount]:-1;
+    }
     
     // ways of making changes
     // implementation without recursion, Dynamic programming
@@ -94,6 +112,10 @@ public class CoinChange {
         new CoinChange().coins(145, new int[]{50, 25, 10, 5,1});
         Instant end = Instant.now();
         out.println("change takes "+ChronoUnit.MICROS.between(start, end));
+        
+        
+        System.out.println(new CoinChange().coinChange(new int[]{1,2,5}, 11));
+        System.out.println(new CoinChange().coinChange(new int[]{7,5}, 11));
     }
 }
 
